@@ -1,2 +1,3 @@
 src/pyzap.egg-info/
 .idea/
+*.pyc

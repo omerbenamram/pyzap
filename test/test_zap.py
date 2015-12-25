@@ -16,12 +16,21 @@ def products_page():
     return BeautifulSoup(r.content, 'lxml')
 
 
-def test_categories_extracted_correctly(products_page):
+def test_gets_resutls(products_page):
     page_results = products_from_page(products_page)
-
     assert len(page_results) > 0
 
+
+def test_categories_extracted_correctly(products_page):
+    page_results = products_from_page(products_page)
     # when columns are extracted badly - we get out of split results such as dates as columns.
+
+    title, details = next(iter(page_results.items()))
+    assert set(details.keys()) == \
+           {'יצרן', 'גודל מסך', 'רזולוציה מקסימלית', 'סוג פאנל', 'זמן תגובה', 'סוג המסך', 'רמקולים', '\u200fPivot',
+            'תלת מימד', 'חיבורים',
+            'תאריך כניסה לזאפ', 'min_price', 'max_price'}
+
     for title, details in page_results.items():
         for k, v in details.items():
             assert not DATE_REGEX.match(k)
