@@ -1,19 +1,35 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
+
 # -*- coding: utf-8 -*-
+import os
 import re
 
 import pytest
 import requests
+from betamax import Betamax
 from bs4 import BeautifulSoup
 
-from pyzap.zap import products_from_page
+from pyzap.zap import products_from_page, search
 
 SAMPLE_URL = 'http://www.zap.co.il/models.aspx?sog=c-monitor'
+SAMPLE_SEARCH_URL_NO_CATEGORY = 'http://www.zap.co.il/search.aspx?sog=נעליים'
 DATE_REGEX = re.compile('\d{1,2}/\d{1,4}')  # matches 01/2014
+
+with Betamax.configure() as config:
+    config.cassette_library_dir = os.path.join(__file__, os.pardir, 'fixtures', 'cassettes')
+
+@pytest.fixture
+def test_session(request):
+    test_session = requests.Session()
+    betamax = Betamax(test_session, cassette_library_dir=config.cassette_library_dir)
+    betamax.use_cassette(request.function.__name__, match_requests_on=['uri', 'body'], record='new_episodes')
+    betamax.start()
+    request.addfinalizer(betamax.stop)
+    return test_session
 
 
 @pytest.fixture
-def products_page():
+def products_page(test_session):
     r = requests.get(SAMPLE_URL)
     return BeautifulSoup(r.content, 'lxml')
 
@@ -33,6 +49,7 @@ def test_categories_extracted_correctly(products_page):
             'תלת מימד', 'חיבורים',
             'תאריך כניסה לזאפ', 'min_price', 'max_price'}
 
-    for title, details in page_results.items():
-        for k, v in details.items():
-            assert not DATE_REGEX.match(k)
+
+def test_gets_result_when_no_category(test_session):
+    results = search('מסך מחשב', session=test_session)
+    assert len(results) > 0

@@ -1,8 +1,10 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
+
 # -*- coding: utf-8 -*-
 import itertools
 import re
 import sys
+import urllib
 import warnings
 
 import logbook
@@ -11,11 +13,12 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 from pies.overrides import *
 
-logger = logbook.Logger(level=logbook.INFO)
+logger = logbook.Logger(level=logbook.DEBUG)
 logger.handlers.append(logbook.StreamHandler(sys.stdout))
 
 PRICE_RE = re.compile('[\d,]+', re.UNICODE)
 BASE_URL = 'http://www.zap.co.il/models.aspx'
+NO_CATEGORY_BASE_URL = 'http://www.zap.co.il/search.aspx'
 WORDS_RE = re.compile('\w+', re.UNICODE)
 BAD_CHARS = ', :<>'
 
@@ -74,17 +77,33 @@ def get_max_available_page_in_context(soup):
         return 1
 
 
-def search(keyword=None, category=None, max_pages=10, show_progress=True):
+def search(keyword=None, category=None, max_pages=10, show_progress=True, **kwargs):
     if not any([keyword, category]):
         raise RuntimeError("Must Input at least one argument!")
 
-    with requests.Session() as s:
+    session = requests.Session() or kwargs.get('session')
+
+    with session as s:
         total_results = {}
         params = {'keyword': keyword}
         if category:
             params['sog'] = category
+            urlbase = BASE_URL
+        else:
+            urlbase = NO_CATEGORY_BASE_URL
+            # check if we get redirected
+            head = requests.Request(method='get', url=urlbase, params=params)
+            headr = s.send(head.prepare())
+            if headr.history:
+                if headr.history[0].headers.get('Location'):
+                    category = urllib.parse.urlparse(headr.history[0].headers.get('Location')).query.split('=')[1]
+                    params['sog'] = category
+                    urlbase = BASE_URL
+                    params.pop('keyword')
+            else:
+                raise RuntimeError('Something bad happened')
 
-        base = requests.Request(method='get', url=BASE_URL, params=params)
+        base = requests.Request(method='get', url=urlbase, params=params)
         logger.debug('Search Params: {}'.format(base.params))
 
         if show_progress:
@@ -92,6 +111,7 @@ def search(keyword=None, category=None, max_pages=10, show_progress=True):
 
         for page in range(1, max_pages + 1):
             params['pageinfo'] = page
+            logger.debug("Sending request: {}".format(base.prepare().url))
             response = s.send(base.prepare())
             response.raise_for_status()
 
@@ -107,6 +127,8 @@ def search(keyword=None, category=None, max_pages=10, show_progress=True):
             if max_page <= page:
                 logger.debug('Hit max pages at {}, breaking'.format(page))
                 break
+        else:
+            logger.info("Hit page limit at page {} out of {}!".format(max_pages, progressbar.n))
 
         logger.debug("Got total {} results".format(len(total_results)))
 

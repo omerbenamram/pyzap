@@ -1,3 +1,4 @@
 src/pyzap.egg-info/
 .idea/
 *.pyc
+/test/fixtures
