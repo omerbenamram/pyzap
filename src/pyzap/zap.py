@@ -72,18 +72,23 @@ def get_max_available_page_in_context(soup):
         return 1
 
 
-def search(keyword, category=None, max_pages=10):
+def search(keyword=None, category=None, max_pages=10, show_progress=True):
+    if not any([keyword, category]):
+        raise RuntimeError("Must Input at least one argument!")
+
     with requests.Session() as s:
         total_results = {}
         params = {'keyword': keyword}
         if category:
             params['sog'] = category
-        else:
-            warnings.warn('Did you forget to enter a category..?')
 
         base = requests.Request(method='get', url=BASE_URL, params=params)
         logger.debug('Search Params: {}'.format(base.params))
-        for page in tqdm(range(1, max_pages + 1)):
+
+        if show_progress:
+            progressbar = tqdm()
+
+        for page in range(1, max_pages + 1):
             params['pageinfo'] = page
             response = s.send(base.prepare())
             response.raise_for_status()
@@ -93,8 +98,17 @@ def search(keyword, category=None, max_pages=10):
             total_results.update(products_from_page(soup))
             max_page = get_max_available_page_in_context(soup)
 
+            if show_progress:
+                progressbar.total = max_page
+                progressbar.update()
+
             if max_page <= page:
                 logger.debug('Hit max pages at {}, breaking'.format(page))
                 break
+
+        logger.debug("Got total {} results".format(len(total_results)))
+
+        if not total_results:
+            warnings.warn('No results! Did you forget to enter a category..?')
 
     return total_results
