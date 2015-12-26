@@ -1,5 +1,5 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
-# -*- coding: <utf-8> -*-
+# -*- coding: utf-8 -*-
 import itertools
 import re
 import sys
