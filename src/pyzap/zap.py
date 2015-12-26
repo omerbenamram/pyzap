@@ -26,6 +26,7 @@ def _handle_price(price_str):
         return None
     prices = PRICE_RE.findall(price_str)
 
+    # numbers are formatted as 2,500 sometimes..
     prices = list(map(lambda x: int(x.replace(',', '')), prices))
     return min(prices), max(prices)
 
@@ -66,6 +67,7 @@ def products_from_page(soup):
 def get_max_available_page_in_context(soup):
     pages = soup.find_all(attrs={'class': 'NumRow'})
     if pages:
+        # basically gets the biggest int out of a bunch of strings
         return int(max(list(filter(lambda x: re.match('\d+', x),
                                    itertools.chain.from_iterable([p.strings for p in pages]))), key=int))
     else:

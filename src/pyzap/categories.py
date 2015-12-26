@@ -5,7 +5,7 @@ from __future__ import absolute_import, unicode_literals, print_function, divisi
 class ZapCategories:
     class Electronics:
         TV = 'e-tv'
-        EbookReaders = 'e-digitalbook'
+        EBookReaders = 'e-digitalbook'
         Ovens = 'e-oven'
 
     class Computers:
