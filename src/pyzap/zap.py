@@ -1,16 +1,18 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
 # -*- coding: utf-8 -*-
+from pies.overrides import *
+from pies import itertools
+
 import re
 import sys
-import urllib.parse
+import urllib
 import warnings
 from enum import Enum
 import logbook
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-from pies.overrides import *
-from pies import itertools
+
 
 from pyzap.categories import suggest_category
 
