@@ -2,16 +2,16 @@ from __future__ import absolute_import, unicode_literals, print_function, divisi
 
 # -*- coding: utf-8 -*-
 import os
-import re
 
 import pytest
 import requests
 from betamax import Betamax
 from bs4 import BeautifulSoup
 
-from pyzap.zap import products_from_page, search
+from pyzap.zap import products_from_page, search, ZapGalleryType, _detect_gallery_type
 
-SAMPLE_URL = 'http://www.zap.co.il/models.aspx?sog=c-monitor'
+SAMPLE_ROWS_URL = 'http://www.zap.co.il/models.aspx?sog=c-monitor'
+SAMPLE_BOX_URL = 'http://www.zap.co.il/models.aspx?sog=p-shoe'
 
 with Betamax.configure() as config:
     config.cassette_library_dir = os.path.join(__file__, os.pardir, 'fixtures', 'cassettes')
@@ -28,21 +28,38 @@ def test_session(request):
 
 
 @pytest.fixture
-def products_page(test_session):
-    r = test_session.get(SAMPLE_URL)
+def rows_products_page(test_session):
+    r = test_session.get(SAMPLE_ROWS_URL)
     return BeautifulSoup(r.content, 'lxml')
 
 
-def test_gets_resutls(products_page):
-    page_results = products_from_page(products_page)
+@pytest.fixture
+def gallery_products_page(test_session):
+    r = test_session.get(SAMPLE_BOX_URL)
+    return BeautifulSoup(r.content, 'lxml')
+
+
+def test_detect_page_correctly(rows_products_page, gallery_products_page):
+    assert _detect_gallery_type(rows_products_page) == ZapGalleryType.ProductRows.value
+    assert _detect_gallery_type(gallery_products_page) == ZapGalleryType.ProductBoxGallery.value
+
+
+def test_rows_page_gets_resutls(rows_products_page):
+    page_results = products_from_page(rows_products_page)
     assert len(page_results) > 0
 
 
-def test_categories_extracted_correctly(products_page):
-    page_results = products_from_page(products_page)
+def test_gallery_page_gets_resutls(gallery_products_page):
+    page_results = products_from_page(gallery_products_page)
+    assert len(page_results) > 0
+
+
+def test_categories_extracted_correctly(rows_products_page):
+    page_results = products_from_page(rows_products_page)
     # when columns are extracted badly - we get out of split results such as dates as columns.
 
-    title, details = next(iter(page_results.items()))
+    details = page_results['מסך מחשב Philips 246V5LHAB  ‏24 ‏אינטש']
+
     assert set(details.keys()) == \
            {'יצרן', 'גודל מסך', 'רזולוציה מקסימלית', 'סוג פאנל', 'זמן תגובה', 'סוג המסך', 'רמקולים', '\u200fPivot',
             'תלת מימד', 'חיבורים',
@@ -50,5 +67,5 @@ def test_categories_extracted_correctly(products_page):
 
 
 def test_gets_result_when_no_category(test_session):
-    results = search('מסך מחשב', session=test_session)
+    results = search('מסך מחשב', session=test_session, max_pages=1)
     assert len(results) > 0

@@ -7,6 +7,10 @@ class ZapCategories:
         TV = 'e-tv'
         EBookReaders = 'e-digitalbook'
         Ovens = 'e-oven'
+        Freezer = 'e-freezer'
+        Projectros = 'e-slideprojector'
+        Refrigerator = 'e-fridge'
+        TVGaming = 'e-tvgame'
 
     class Computers:
         CardReader = 'c-cardreader'
