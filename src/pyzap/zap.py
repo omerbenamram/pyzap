@@ -13,7 +13,12 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 from pies.overrides import *
 
-logger = logbook.Logger(level=logbook.DEBUG)
+if hasattr(sys, '_called_from_test'):
+    # called from within a test run
+    logger = logbook.Logger(level=logbook.DEBUG)
+else:
+    logger = logbook.Logger(level=logbook.INFO)
+
 logger.handlers.append(logbook.StreamHandler(sys.stdout))
 
 PRICE_RE = re.compile('[\d,]+', re.UNICODE)
@@ -90,18 +95,19 @@ def search(keyword=None, category=None, max_pages=10, show_progress=True, **kwar
             params['sog'] = category
             urlbase = BASE_URL
         else:
+            # this part is a little ugly - it handles a case where we have to infer category from redirection
             urlbase = NO_CATEGORY_BASE_URL
             # check if we get redirected
             head = requests.Request(method='get', url=urlbase, params=params)
-            headr = s.send(head.prepare())
-            if headr.history:
-                if headr.history[0].headers.get('Location'):
-                    category = urllib.parse.urlparse(headr.history[0].headers.get('Location')).query.split('=')[1]
+            head_resp = s.send(head.prepare())
+            if head_resp.history:
+                if head_resp.history[0].headers.get('Location'):
+                    category = urllib.parse.urlparse(head_resp.history[0].headers.get('Location')).query.split('=')[1]
                     params['sog'] = category
                     urlbase = BASE_URL
                     params.pop('keyword')
             else:
-                raise RuntimeError('Something bad happened')
+                urlbase = BASE_URL
 
         base = requests.Request(method='get', url=urlbase, params=params)
         logger.debug('Search Params: {}'.format(base.params))

@@ -18,6 +18,7 @@ DATE_REGEX = re.compile('\d{1,2}/\d{1,4}')  # matches 01/2014
 with Betamax.configure() as config:
     config.cassette_library_dir = os.path.join(__file__, os.pardir, 'fixtures', 'cassettes')
 
+
 @pytest.fixture
 def test_session(request):
     test_session = requests.Session()
