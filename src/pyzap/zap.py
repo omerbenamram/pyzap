@@ -5,7 +5,7 @@ from pies import itertools
 
 import re
 import sys
-import urllib
+import urllib.parse
 import warnings
 from enum import Enum
 import logbook
