@@ -2,19 +2,24 @@ from __future__ import absolute_import, unicode_literals, print_function, divisi
 # -*- coding: utf-8 -*-
 from pies.overrides import *
 from pies import itertools
-
 import re
 import sys
-import urllib.parse
+
 import warnings
 from enum import Enum
 import logbook
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-
-
 from pyzap.categories import suggest_category
+
+
+if PY3:
+    import urllib.parse
+if PY2:
+    import urlparse
+    setattr(urllib, 'parse', urlparse)
+
 
 if hasattr(sys, '_called_from_test'):
     # called from within a test run
