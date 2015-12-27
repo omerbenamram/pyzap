@@ -197,7 +197,8 @@ def search(keyword=None, category=None, max_pages=10, show_progress=True, sessio
                 warnings.warn('No results! Did you forget to enter a category..?')
             else:
                 warnings.warn(
-                    'No results! maybe try one of the following categories {}'.format(suggest_category(category)))
+                    'No results! maybe try one of the following categories:')
+                print(suggest_category(category), file=sys.stderr)
 
     logger.info("Total {} results".format(len(total_results)))
     return total_results
