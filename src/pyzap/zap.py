@@ -14,9 +14,9 @@ from pies import itertools
 
 if hasattr(sys, '_called_from_test'):
     # called from within a test run
-    logger = logbook.Logger(level=logbook.DEBUG)
+    logger = logbook.Logger("pyzap", level=logbook.DEBUG)
 else:
-    logger = logbook.Logger(level=logbook.INFO)
+    logger = logbook.Logger("pyzap", level=logbook.INFO)
 
 logger.handlers.append(logbook.StreamHandler(sys.stdout))
 
@@ -193,4 +193,5 @@ def search(keyword=None, category=None, max_pages=10, show_progress=True, **kwar
         if not total_results:
             warnings.warn('No results! Did you forget to enter a category..?')
 
+    logger.info("Total {} results".format(len(total_results)))
     return total_results
