@@ -12,6 +12,8 @@ from tqdm import tqdm
 from pies.overrides import *
 from pies import itertools
 
+from pyzap.categories import suggest_category
+
 if hasattr(sys, '_called_from_test'):
     # called from within a test run
     logger = logbook.Logger("pyzap", level=logbook.DEBUG)
@@ -134,11 +136,11 @@ def products_from_page(soup):
         return _handle_rows_page(soup)
 
 
-def search(keyword=None, category=None, max_pages=10, show_progress=True, **kwargs):
+def search(keyword=None, category=None, max_pages=10, show_progress=True, session=None, **kwargs):
     if not any([keyword, category]):
         raise RuntimeError("Must Input at least one argument!")
 
-    session = requests.Session() or kwargs.get('session')
+    session = requests.Session() or session
 
     with session as s:
         total_results = {}
@@ -191,7 +193,11 @@ def search(keyword=None, category=None, max_pages=10, show_progress=True, **kwar
         logger.debug("Got total {} results".format(len(total_results)))
 
         if not total_results:
-            warnings.warn('No results! Did you forget to enter a category..?')
+            if not category:
+                warnings.warn('No results! Did you forget to enter a category..?')
+            else:
+                warnings.warn(
+                    'No results! maybe try one of the following categories {}'.format(suggest_category(category)))
 
     logger.info("Total {} results".format(len(total_results)))
     return total_results

@@ -5,9 +5,8 @@ import logbook
 import sys
 
 import pyzap
+from pyzap.categories import suggest_category
 import pandas as pd
-from fuzzywuzzy import process
-from pies import itertools
 
 CATEGORY_FUZZ_THRESHOLD = 70
 
@@ -18,23 +17,15 @@ else:
     logger = logbook.Logger(level=logbook.INFO)
 
 
-def _get_attrs_dict(x):
-    return {attr: getattr(x, attr) for attr in dir(x) if not callable(attr) and not attr.startswith("__")}
-
-
-all_attrs = itertools.chain.from_iterable([_get_attrs_dict(cat).values() for cat in _get_attrs_dict(pyzap.ZapCategories).values()])
-
-
 @click.command()
 @click.argument('keyword', nargs=1, type=click.STRING)
 @click.option('-c', '--category', help='Category to search')
 @click.option('--csv', help='Use CSV instead of excel for output')
 @click.option('-o', '--output', type=click.Path(), help='Output path', required=True)
 def cli_main(keyword, category, output, csv):
-
     if category:
         while True:
-            categories = process.extract(category, all_attrs, limit=3)
+            categories = suggest_category(category)
             if categories:
                 match = categories[0]
                 if match[1] > CATEGORY_FUZZ_THRESHOLD:
