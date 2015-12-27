@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals, print_function, divisi
 # -*- coding: utf-8 -*-
 import re
 import sys
-import urllib
+import urllib.parse
 import warnings
 from enum import Enum
 import logbook
