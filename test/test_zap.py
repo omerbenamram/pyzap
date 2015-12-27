@@ -12,8 +12,6 @@ from bs4 import BeautifulSoup
 from pyzap.zap import products_from_page, search
 
 SAMPLE_URL = 'http://www.zap.co.il/models.aspx?sog=c-monitor'
-SAMPLE_SEARCH_URL_NO_CATEGORY = 'http://www.zap.co.il/search.aspx?sog=נעליים'
-DATE_REGEX = re.compile('\d{1,2}/\d{1,4}')  # matches 01/2014
 
 with Betamax.configure() as config:
     config.cassette_library_dir = os.path.join(__file__, os.pardir, 'fixtures', 'cassettes')
@@ -31,7 +29,7 @@ def test_session(request):
 
 @pytest.fixture
 def products_page(test_session):
-    r = requests.get(SAMPLE_URL)
+    r = test_session.get(SAMPLE_URL)
     return BeautifulSoup(r.content, 'lxml')
 
 
