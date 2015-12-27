@@ -14,8 +14,7 @@ from tqdm import tqdm
 from pyzap.categories import suggest_category
 
 
-if PY3:
-    import urllib.parse
+import urllib
 if PY2:
     import urlparse
     setattr(urllib, 'parse', urlparse)
