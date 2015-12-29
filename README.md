@@ -17,7 +17,7 @@ import pyzap
 import pandas as pd
 
 results = pyzap.search('4k', category=pyzap.ZapCategories.Electronics.TV)
-df = pd.DataFrame(results).transpose().fillna('')
+df = pd.DataFrame(results).transpose().sort('min_price').fillna('')
 df
 ```
 <table border="1" class="dataframe">
