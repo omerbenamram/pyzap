@@ -11,7 +11,7 @@ import pyzap
 pyzap.search(keyword, category=pyzap.ZapCategories.Electronics.TV)
 ```
 
-if you're using the IPython Notebook, viewing of the results with pandas is recommended!
+If you're using the IPython Notebook, usage with pandas is recommended!
 ```python
 import pyzap
 import pandas as pd
