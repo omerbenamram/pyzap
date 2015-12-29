@@ -1,28 +1,25 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
 # -*- coding: utf-8 -*-
 import click
-import logbook
-import sys
-
 import pyzap
 from pyzap.categories import suggest_category
 import pandas as pd
 
 CATEGORY_FUZZ_THRESHOLD = 70
 
-if hasattr(sys, '_called_from_test'):
-    # called from within a test run
-    logger = logbook.Logger(level=logbook.DEBUG)
-else:
-    logger = logbook.Logger(level=logbook.INFO)
-
 
 @click.command()
-@click.argument('keyword', nargs=1, type=click.STRING)
+@click.option('-k', '-keyword', type=click.STRING, prompt=True)
 @click.option('-c', '--category', help='Category to search')
-@click.option('--csv', help='Use CSV instead of excel for output')
-@click.option('-o', '--output', type=click.Path(), help='Output path', required=True)
+@click.option('--csv', help='Use CSV instead of excel for output', is_flag=True)
+@click.option('-o', '--output', type=click.Path(), help='Output path', required=True,
+              prompt="Where should I save the results?")
 def cli_main(keyword, category, output, csv):
+    # got surrogate escape
+    if '?' in keyword:
+        raise Exception("Could'nt read UNICODE arguments from argv in this shell :(\n"
+                        "Use the python interface..")
+
     if category:
         while True:
             categories = suggest_category(category)

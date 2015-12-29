@@ -19,12 +19,12 @@ with Betamax.configure() as config:
 
 @pytest.fixture
 def test_session(request):
-    test_session = requests.Session()
-    betamax = Betamax(test_session, cassette_library_dir=config.cassette_library_dir)
+    session = requests.Session()
+    betamax = Betamax(session, cassette_library_dir=config.cassette_library_dir)
     betamax.use_cassette(request.function.__name__, match_requests_on=['uri', 'body'], record='new_episodes')
     betamax.start()
     request.addfinalizer(betamax.stop)
-    return test_session
+    return session
 
 
 @pytest.fixture
