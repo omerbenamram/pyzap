@@ -4,7 +4,6 @@ from pies.overrides import *
 from pies import itertools
 import re
 import sys
-
 import warnings
 from enum import Enum
 import logbook
@@ -12,13 +11,12 @@ import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 from pyzap.categories import suggest_category
-
-
 import urllib
+
 if PY2:
     import urlparse
-    setattr(urllib, 'parse', urlparse)
 
+    setattr(urllib, 'parse', urlparse)
 
 if hasattr(sys, '_called_from_test'):
     # called from within a test run
@@ -142,7 +140,7 @@ def products_from_page(soup):
         return _handle_rows_page(soup)
 
 
-def search(keyword=None, category=None, max_pages=10, show_progress=True, session=None, **kwargs):
+def search(keyword=None, category=None, max_pages=None, show_progress=True, session=None, **kwargs):
     if not any([keyword, category]):
         raise RuntimeError("Must Input at least one argument!")
 
@@ -151,23 +149,29 @@ def search(keyword=None, category=None, max_pages=10, show_progress=True, sessio
     with session as s:
         total_results = {}
         params = {'keyword': keyword}
+        urlbase = BASE_URL
+
         if category:
             params['sog'] = category
-            urlbase = BASE_URL
-        else:
+
+        if not category:
             # this part is a little ugly - it handles a case where we have to infer category from redirection
-            urlbase = NO_CATEGORY_BASE_URL
             # check if we get redirected
+            logger.debug("No Category received, trying to infer category from redirection")
+            urlbase = NO_CATEGORY_BASE_URL
             head = requests.Request(method='get', url=urlbase, params=params)
             head_resp = s.send(head.prepare())
+
             if head_resp.history:
                 if head_resp.history[0].headers.get('Location'):
                     category = urllib.parse.urlparse(head_resp.history[0].headers.get('Location')).query.split('=')[1]
                     params['sog'] = category
-                    urlbase = BASE_URL
                     params.pop('keyword')
+                    logger.debug("Successfully extracted category {}".format(category))
             else:
-                urlbase = BASE_URL
+                logger.error("Could'nt get redirection information.. category is not available.")
+
+            urlbase = BASE_URL
 
         base = requests.Request(method='get', url=urlbase, params=params)
         logger.debug('Search Params: {}'.format(base.params))
@@ -175,8 +179,11 @@ def search(keyword=None, category=None, max_pages=10, show_progress=True, sessio
         if show_progress:
             progressbar = tqdm()
 
-        for page in range(1, max_pages + 1):
-            params['pageinfo'] = page
+        reached_page_limit = False
+        current_page = 1
+
+        while not reached_page_limit:
+            params['pageinfo'] = current_page
             logger.debug("Sending request: {}".format(base.prepare().url))
             response = s.send(base.prepare())
             response.raise_for_status()
@@ -184,17 +191,16 @@ def search(keyword=None, category=None, max_pages=10, show_progress=True, sessio
             soup = BeautifulSoup(response.content, "lxml")
 
             total_results.update(products_from_page(soup))
-            max_page = _get_max_available_page_in_context(soup)
+            max_available_page_from_scope = _get_max_available_page_in_context(soup)
+            if (max_available_page_from_scope == current_page) or (max_pages == current_page):
+                reached_page_limit = True
+                logger.debug('Hit last page at {}, breaking'.format(current_page))
 
             if show_progress:
-                progressbar.total = max_page
+                progressbar.total = max_available_page_from_scope
                 progressbar.update()
 
-            if max_page <= page:
-                logger.debug('Hit last page at {}, breaking'.format(page))
-                break
-        else:
-            logger.info("Hit page limit at page {}".format(max_pages))
+            current_page += 1
 
         logger.debug("Got total {} results".format(len(total_results)))
 

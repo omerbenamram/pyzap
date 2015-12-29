@@ -14,7 +14,8 @@ CATEGORY_FUZZ_THRESHOLD = 70
 @click.option('--csv', help='Use CSV instead of excel for output', is_flag=True)
 @click.option('-o', '--output', type=click.Path(), help='Output path', required=True,
               prompt="Where should I save the results?")
-def cli_main(keyword, category, output, csv):
+@click.option('--max-pages', help='Max pages to scrape', type=click.INT)
+def cli_main(keyword, category, output, csv, max_pages):
     # got surrogate escape
     if '?' in keyword:
         raise Exception("Could'nt read UNICODE arguments from argv in this shell :(\n"
@@ -33,7 +34,7 @@ def cli_main(keyword, category, output, csv):
                                     "{}\n"
                                     "Re enter category please".format([x[0] for x in categories]))
 
-    df = pd.DataFrame(pyzap.search(keyword=keyword, category=category)).transpose()
+    df = pd.DataFrame(pyzap.search(keyword=keyword, category=category, max_pages=max_pages)).transpose()
     if csv:
         df.to_csv(output)
         return
