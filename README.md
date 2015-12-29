@@ -133,15 +133,15 @@ df
 or use from command line (still a little rough with unicode support for argv in Windows).  
 (and get awesome excel support via pandas)
 
-    pyzap --help
+    $ pyzap --help
    
 
 or just 
 
-    pyzap
+    $ pyzap
     
 to get interactive prompt!
 
 ##Installation:
 - clone the repo
-- python src/setup.py
+- python src/setup.py install
