@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name="pyzap",
     version="0.1",
-    packages='pyzap',
+    packages=['pyzap'],
     install_requires=['beautifulsoup4', 'logbook', 'requests', 'tqdm', 'pies', 'click', 'fuzzywuzzy',
                       'pandas'],
     tests_require=['pytest', 'betamax'],
