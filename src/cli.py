@@ -1,5 +1,8 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
+
 # -*- coding: utf-8 -*-
+import os
+
 import click
 import pyzap
 from pyzap.categories import suggest_category
@@ -12,8 +15,9 @@ CATEGORY_FUZZ_THRESHOLD = 70
 @click.option('-k', '-keyword')
 @click.option('-c', '--category', help='Category to search')
 @click.option('--csv', help='Use CSV instead of excel for output', is_flag=True)
-@click.option('-o', '--output', type=click.Path(), help='Output path', required=True,
-              prompt="Where should I save the results?")
+@click.option('-o', '--output', type=click.Path(resolve_path=True, dir_okay=True, file_okay=True,
+                                                writable=True), help='Output path',
+              required=True, prompt="Where should I save the results?")
 @click.option('--max-pages', help='Max pages to scrape', type=click.INT)
 def cli_main(keyword, category, output, csv, max_pages):
     # this supports windows shell :)!
@@ -39,6 +43,9 @@ def cli_main(keyword, category, output, csv, max_pages):
             category = click.prompt("Couldn't match any known category.. Closest matches:\n"
                                     "{}\n"
                                     "Re enter category please".format([x[0] for x in categories]))
+
+    if os.path.isdir(output):
+        output = os.path.join(output, keyword.strip('\n') + ('.xlsx' if not csv else '.csv'))
 
     df = pd.DataFrame(pyzap.search(keyword=keyword, category=category, max_pages=max_pages)).transpose()
     if csv:
