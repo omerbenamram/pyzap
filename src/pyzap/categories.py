@@ -287,7 +287,8 @@ def _get_recursive_attrs_dict(x):
 
 
 all_attrs = _get_recursive_attrs_dict(ZapCategories)
+all_categories_strings = [x.category for x in all_attrs.values()]
 
 
 def suggest_category(category):
-    return process.extract(category, all_attrs, limit=3)
+    return process.extract(category, all_categories_strings, limit=3)
