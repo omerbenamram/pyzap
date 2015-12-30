@@ -3,9 +3,10 @@ python:
     - "2.7"
     - "3.4"
     - "3.5"
-before_install:
-    - pip install -r requirements.txt
 install:
-    - python src/setup.py install
+    - pip install -r requirements.txt
+    - cd ./src
+    - ls -la
+    - python setup.py develop
 script:
     - test/py.test

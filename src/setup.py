@@ -8,7 +8,7 @@ setup(
     packages=['pyzap'],
     install_requires=['beautifulsoup4', 'logbook', 'requests', 'tqdm', 'pies', 'click', 'fuzzywuzzy',
                       'pandas'],
-    tests_require=['pytest', 'betamax'],
+    tests_require=['pytest', 'betamax', 'google-api-python-client'],
     author="OmerBA",
     description="Search Zap without a hassle",
     entry_points={
