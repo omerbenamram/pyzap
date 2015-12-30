@@ -4,7 +4,7 @@ click==6.2
 colorama==0.3.5
 fuzzywuzzy==0.8.0
 Logbook==0.12.3
-numpy==1.10.2
+numpy>1.7.0
 pandas==0.17.1
 pies==2.6.7
 py==1.4.31
