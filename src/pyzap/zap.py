@@ -168,10 +168,11 @@ def search(keyword=None, category=None, max_pages=None, show_progress=True, sess
                     params['sog'] = category
                     params.pop('keyword')
                     logger.debug("Successfully extracted category {}".format(category))
+                    urlbase = BASE_URL
             else:
-                logger.error("Could'nt get redirection information.. category is not available.")
-
-            urlbase = BASE_URL
+                # even if no category is available we will get misc results
+                logger.error("Could'nt autodetect category.. search will not be filtered!")
+                urlbase = NO_CATEGORY_BASE_URL
 
         base = requests.Request(method='get', url=urlbase, params=params)
         logger.debug('Search Params: {}'.format(base.params))
