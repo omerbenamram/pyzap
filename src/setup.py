@@ -6,9 +6,9 @@ setup(
     name="pyzap",
     version="0.1",
     packages=find_packages(),
-    install_requires=['beautifulsoup4', 'logbook', 'requests', 'tqdm', 'pies', 'betamax', 'click', 'fuzzywuzzy',
+    install_requires=['beautifulsoup4', 'logbook', 'requests', 'tqdm', 'pies', 'click', 'fuzzywuzzy',
                       'pandas'],
-    tests_require=['pytest'],
+    tests_require=['pytest', 'betamax'],
     author="OmerBA",
     description="Search Zap without a hassle",
     entry_points={
