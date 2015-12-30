@@ -9,17 +9,23 @@ CATEGORY_FUZZ_THRESHOLD = 70
 
 
 @click.command()
-@click.option('-k', '-keyword', type=click.STRING, prompt=True)
+@click.option('-k', '-keyword')
 @click.option('-c', '--category', help='Category to search')
 @click.option('--csv', help='Use CSV instead of excel for output', is_flag=True)
 @click.option('-o', '--output', type=click.Path(), help='Output path', required=True,
               prompt="Where should I save the results?")
 @click.option('--max-pages', help='Max pages to scrape', type=click.INT)
 def cli_main(keyword, category, output, csv, max_pages):
-    # got surrogate escape
+    # this supports windows shell :)!
+    # ? happens when we get surrogate escape :(
+    stdin = click.get_text_stream('stdin')
+    if not keyword:
+        click.echo('Keyword: ', nl=False)
+        keyword = stdin.readline()
+
     if '?' in keyword:
-        raise Exception("Could'nt read UNICODE arguments from argv in this shell :(\n"
-                        "Use the python interface..")
+        click.echo('Sorry, received bad input from argv, please enter input keyword here instead:')
+        keyword = stdin.readline()
 
     if category:
         while True:
