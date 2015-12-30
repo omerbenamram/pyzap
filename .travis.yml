@@ -6,7 +6,8 @@ python:
 install:
     - pip install -r requirements.txt
     - cd ./src
-    - ls -la
     - python setup.py develop
+    - cd ../
 script:
-    - test/py.test
+    - cd ./test
+    - py.test
