@@ -268,6 +268,99 @@ class ZapCategories:
             OfficeSoftware=ZapCategory(category='c-office', hebrew_description='תוכנות משרדיות', english_description='Office software')
             Educational=ZapCategory(category='c-software', hebrew_description='תוכנות ולומדות', english_description='Software and courseware')
 
+    class PersonalCare:
+        class Fashion:
+            Sunglasses=ZapCategory(category='b-glasses', hebrew_description='משקפי שמש', english_description='Sunglasses')
+            Glasses=ZapCategory(category='b-visionglasses', hebrew_description='משקפי ראייה', english_description='Glasses')
+            jewelry=ZapCategory(category='g-jewlery', hebrew_description='תכשיטים', english_description='jewelry')
+            Bags=ZapCategory(category='h-bags', hebrew_description='תיקים', english_description='Cases')
+
+        class BodyCare:
+            WomenFragrance=ZapCategory(category='b-perfume', hebrew_description='בשמים לאישה', english_description='woman fragrance')
+            MenFragrance=ZapCategory(category='b-aftershave', hebrew_description='בשמים לגבר', english_description="Men's fragrance")
+            HairCare=ZapCategory(category='b-shampoo', hebrew_description='טיפוח שיער', english_description='Hair Care')
+            ChildrenPerfumes=ZapCategory(category='b-kidsperfume', hebrew_description='בשמים לילדים', english_description='Perfumes for Children')
+            HairRemovalProduct=ZapCategory(category='b-hairremoving', hebrew_description='מוצרים להסרת שיער', english_description='Hair Removal Product')
+            Oils=ZapCategory(category='b-oil', hebrew_description='שמנים', english_description='Oils')
+            HairAccessories=ZapCategory(category='b-hairaccessories', hebrew_description='אביזרים לשיער', english_description='Hair Accessories')
+            Depilatories=ZapCategory(category='e-hairremover', hebrew_description='מסירי שיער', english_description='Depilatories')
+            GreenCareProducts=ZapCategory(category='b-greencare', hebrew_description='מוצרי טיפוח ירוקים', english_description='Green care products')
+            BodyCreams=ZapCategory(category='b-creambody', hebrew_description='קרמי גוף', english_description='Body Creams')
+            EyeCreams=ZapCategory(category='b-creameye', hebrew_description='קרמי עיניים', english_description='Eye Creams')
+            FacialCareproducts=ZapCategory(category='b-creamface', hebrew_description='מוצרים לטיפוח הפנים', english_description='Facial care products')
+            HairDye=ZapCategory(category='b-haircolor', hebrew_description='צבעי שיער', english_description='Hair Dye')
+
+        class Cosmetics:
+            EyeMakeup=ZapCategory(category='b-eyemakeup', hebrew_description='איפור עיניים', english_description='Eye Makeup')
+            Facialmakeup=ZapCategory(category='b-facemakeup', hebrew_description='איפור פנים', english_description='Facial makeup')
+            Lipsticks=ZapCategory(category='b-lipstick', hebrew_description='שפתונים', english_description='Lipsticks')
+            Cosmetologyequipmentandliterature=ZapCategory(category='b-cosmeticequipment', hebrew_description='ציוד לקוסמטיקאיות ומספרות', english_description='Cosmetology equipment and literature')
+            MakeupTool=ZapCategory(category='b-makeupequip', hebrew_description='כלי איפור', english_description='Makeup Tool')
+            Nailequipment=ZapCategory(category='b-nail', hebrew_description='ציוד לציפורניים', english_description='Nail equipment')
+
+        class SmokingCessation:
+            SmokingCessation=ZapCategory(category='b-smoke', hebrew_description='הפסקת עישון', english_description='Smoking Cessation')
+            ECigaretteLiquidFill=ZapCategory(category='b-smokeliquid', hebrew_description='נוזל מילוי לסיגריות אלקטרוניות', english_description='Liquid filling of electronic cigarettes')
+            ECigaretteAccesories=ZapCategory(category='b-smokeaccessories', hebrew_description='אביזרים לסיגריות אלקטרוניות', english_description='Accessories for electronic cigarettes')
+            ECigarette=ZapCategory(category='b-electroniccigarette', hebrew_description='סיגריות אלקטרוניות', english_description='Electronic cigarettes')
+
+        class Clothing:
+            Shirts=ZapCategory(category='p-shirt', hebrew_description='חולצות', english_description='Shirts')
+            pants=ZapCategory(category='p-pants', hebrew_description='מכנסיים', english_description='pants')
+            Shoes=ZapCategory(category='p-shoe', hebrew_description='נעליים', english_description='Shoes')
+            Lingerie=ZapCategory(category='p-underwear', hebrew_description='הלבשה תחתונה', english_description='Lingerie')
+            Swimwear=ZapCategory(category='p-swimsuit', hebrew_description='בגדי ים', english_description='Swimwear')
+            Hats=ZapCategory(category='p-hat', hebrew_description='כובעים', english_description='Hats')
+            Jackets=ZapCategory(category='p-coat', hebrew_description='מעילים', english_description='Jackets')
+            Belts=ZapCategory(category='p-belt', hebrew_description='חגורות', english_description='Belts')
+            ClothingGeneral=ZapCategory(category='p-clothing', hebrew_description='הלבשה כללי', english_description='Clothing General')
+
+        class Hygiene:
+            ShavingAccessories=ZapCategory(category='b-shaving', hebrew_description='גילוח ואביזרים', english_description='Shaving Accessories')
+            HygieneWomen=ZapCategory(category='b-hegyena', hebrew_description='היגיינת נשים', english_description='Hygiene Women')
+            deodorant=ZapCategory(category='b-deodorant', hebrew_description='דאודורנט', english_description='deodorant')
+            Oralhygiene=ZapCategory(category='b-tooth', hebrew_description='הגיינת הפה', english_description='Oral hygiene')
+            Wipesandtissues=ZapCategory(category='b-wettowel', hebrew_description='מגבונים וממחטות', english_description='Wipes and tissues')
+            Soaps=ZapCategory(category='b-soap', hebrew_description='סבונים', english_description='Soaps')
+
+        class Health:
+            Vitamins=ZapCategory(category='b-vitamin', hebrew_description='ויטמינים', english_description='Vitamins')
+            Multivitamins=ZapCategory(category='b-multivitamin', hebrew_description='מולטי ויטמינים', english_description='Multivitamins')
+            Minerals=ZapCategory(category='b-mineral', hebrew_description='מינרלים', english_description='Minerals')
+            Herbs=ZapCategory(category='b-plants', hebrew_description='צמחי מרפא', english_description='medical herbs')
+            NutritionalSupplements=ZapCategory(category='b-vitaminnew', hebrew_description='תוספי תזונה ותרופות ללא מרשם', english_description='Nutritional supplements and non-prescription medicines')
+            PainRelieve=ZapCategory(category='b-pain', hebrew_description='כאבים וחום', english_description='Pain and fever')
+            Cough=ZapCategory(category='b-cough', hebrew_description='נשימה', english_description='breathing')
+            Diabetes=ZapCategory(category='b-diabetic', hebrew_description='סכרת', english_description='diabetes')
+            BloodPressure=ZapCategory(category='b-bloodpressure', hebrew_description='לחץ דם ודופק', english_description='Blood pressure and pulse')
+            NaturalFoodSupplements=ZapCategory(category='b-additive', hebrew_description='תוספי מזון לספורטאים', english_description='Natural Food Supplements')
+            ContactLenses=ZapCategory(category='b-contactlens', hebrew_description='עדשות מגע', english_description='Contact Lenses')
+            OrthopedicSupplies=ZapCategory(category='b-orthoped', hebrew_description='ציוד אורטופדי', english_description='Orthopedic Supplies')
+            WalkingAids=ZapCategory(category='b-walkingaids', hebrew_description='עזרי הליכה', english_description='Walking aids')
+            Nursing=ZapCategory(category='b-nursing', hebrew_description='ציוד סיעודי ופיזיותרפיה', english_description='Nursing and physiotherapy equipment')
+            Insole=ZapCategory(category='s-footsupport', hebrew_description='מדרסים', english_description='Insole')
+            Diapers=ZapCategory(category='b-diapers', hebrew_description='מוצרי ספיגה', english_description='Absorbent products')
+            Wheelchairs=ZapCategory(category='b-wheelchair', hebrew_description='כסאות גלגלים', english_description='Wheelchairs')
+            Sunscreen=ZapCategory(category='b-tanning', hebrew_description='מקדמי הגנה', english_description='Protection factors')
+            BathroomSafety=ZapCategory(category='b-aidbath', hebrew_description='בטיחות באמבטיה ובשירותים', english_description='Safety bathrooms')
+            ClinicEquipment=ZapCategory(category='b-medicalequipment', hebrew_description='ציוד למרפאות ומעבדות', english_description='Equipment clinics and laboratories')
+            Pregnancy=ZapCategory(category='b-pregnancy', hebrew_description='מוצרי פריון, הריון ולידה', english_description='Products fertility, pregnancy and childbirth')
+            Thermometers=ZapCategory(category='b-termometer', hebrew_description='מדי חום', english_description='Thermometers')
+            AcneTreatment=ZapCategory(category='b-acne', hebrew_description='טיפול באקנה', english_description='Acne Treatment')
+            Contraception=ZapCategory(category='b-condom', hebrew_description='אמצעי מניעה', english_description='Contraception')
+            GreenProducts=ZapCategory(category='b-green', hebrew_description='מוצרים ירוקים', english_description='Green Products')
+            GreenProductsBaby=ZapCategory(category='b-greenbaby', hebrew_description='מוצרים ירוקים לתינוק', english_description='Green Products baby')
+            GreencareProducts=ZapCategory(category='b-greencare', hebrew_description='מוצרי טיפוח ירוקים', english_description='Green care products')
+            GreenCleaning=ZapCategory(category='b-greenclean', hebrew_description='חומרי ניקוי ירוקים', english_description='Green Cleaning')
+
+        class FirstAid:
+            FirstAidKit=ZapCategory(category='b-firstaid', hebrew_description='ערכות עזרה ראשונה', english_description='First aid kit')
+            FirstAidAccessories=ZapCategory(category='b-firstaidsubstance', hebrew_description='אביזרי עזרה ראשונה', english_description='Accessories First Aid')
+
+        class Massage:
+            Massagers=ZapCategory(category='e-massage', hebrew_description='מכשירי עיסוי', english_description='Massagers')
+            SpaEquipment=ZapCategory(category='b-spaequipment', hebrew_description='ציוד לספא', english_description='Spa equipment')
+
 
 def _get_recursive_attrs_dict(x):
     results = {}

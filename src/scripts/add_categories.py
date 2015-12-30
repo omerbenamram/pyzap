@@ -1,5 +1,7 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
+
 # -*- coding: utf-8 -*-
+import os
 
 import requests
 import re
@@ -8,12 +10,16 @@ from functools import partial
 from googleapiclient.discovery import build
 
 from pyzap.categories import ZapCategory
+from pies.overrides import *
 
 computers_categories = r'http://www.zap.co.il/cat.aspx?cat=comp'
 electric_categories = r'http://www.zap.co.il/cat.aspx?cat=electric'
 
-with open('apikey.txt') as apikey:
-    GOOGLE_TRANSLATE_APIKEY = apikey.read()
+with open(os.path.join(__file__, os.pardir, 'apikey.txt')) as apikey:
+    try:
+        GOOGLE_TRANSLATE_APIKEY = apikey.read()
+    except OSError:
+        print("Make sure your google api key is placed in apikey.txt!")
 
 TRANSLATOR = build('translate', 'v2', developerKey=GOOGLE_TRANSLATE_APIKEY)
 
