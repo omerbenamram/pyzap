@@ -15,6 +15,8 @@ SAMPLE_BOX_URL = 'http://www.zap.co.il/models.aspx?sog=p-shoe'
 
 with Betamax.configure() as config:
     config.cassette_library_dir = os.path.join(__file__, os.pardir, 'fixtures', 'cassettes')
+    if not os.path.exists(config.cassette_library_dir):
+        os.makedirs(config.cassette_library_dir)
 
 
 @pytest.fixture
