@@ -30,7 +30,6 @@ pies==2.6.7
 py==1.4.31
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
-pycharm===debug
 pycparser==2.14
 pycrypto==2.6.1
 Pygments==2.0.2
