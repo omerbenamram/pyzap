@@ -12,7 +12,7 @@ from pyzap.categories import ZapCategory
 computers_categories = r'http://www.zap.co.il/cat.aspx?cat=comp'
 electric_categories = r'http://www.zap.co.il/cat.aspx?cat=electric'
 
-with open('./apikey.txt') as apikey:
+with open('apikey.txt') as apikey:
     GOOGLE_TRANSLATE_APIKEY = apikey.read()
 
 TRANSLATOR = build('translate', 'v2', developerKey=GOOGLE_TRANSLATE_APIKEY)
