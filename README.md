@@ -3,7 +3,7 @@
 www.zap.co.il is Israel's biggest price comparison site!  
 However, it has a terrible GUI..  
 
-I've created pyzap :zap: to allow fast scraping for convinient price comparison
+I've created pyzap :zap: to allow fast scraping for convenient price comparison
 
 # How to use?
 ```python
