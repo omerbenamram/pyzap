@@ -1,7 +1,6 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
 # -*- coding: utf-8 -*-
-from pies.overrides import *
-from pies import itertools
+
 import re
 import sys
 import warnings
@@ -12,6 +11,9 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 from pyzap.categories import suggest_category
 import urllib
+
+from pies.overrides import *
+from pies import itertools
 
 if PY2:
     import urlparse
