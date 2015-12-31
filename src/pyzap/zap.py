@@ -11,7 +11,6 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 from pyzap.categories import suggest_category
 import urllib
-
 from pies.overrides import *
 from pies import itertools
 
@@ -29,6 +28,8 @@ else:
 logger.handlers.append(logbook.StreamHandler(sys.stdout))
 
 PRICE_RE = re.compile('[\d,]+', re.UNICODE)
+CAT_RE = re.compile("/models\.aspx\?sog=([\w-]+)")
+MODEL_ID_RE = re.compile("/model\.aspx\?modelid=(\d+)")
 BASE_URL = 'http://www.zap.co.il/models.aspx'
 NO_CATEGORY_BASE_URL = 'http://www.zap.co.il/search.aspx'
 WORDS_RE = re.compile('\w+', re.UNICODE)
@@ -67,7 +68,8 @@ def _handle_gallery_page(soup):
     results_dict = {}
 
     for box in results:
-        title = box.find(attrs={"class": "ProdName"}).a.text
+        product_name_element = box.find(attrs={"class": "ProdName"})
+        title, model_id = product_name_element.a.text, MODEL_ID_RE.findall(product_name_element.a.get('href'))[0]
         num_of_stores = int(box.find(attrs={'class': 'num'}).text) or 0
         num_of_reviews = ''.join(box.find(attrs={"class": "ReviewsLink"}).strings).strip('\n')
 
@@ -85,6 +87,7 @@ def _handle_gallery_page(soup):
         if price_info:
             min_price, max_price = _handle_price(price_info.text)
 
+        results_dict[title]['id'] = model_id
         results_dict[title]['min_price'] = min_price
         results_dict[title]['max_price'] = max_price
         results_dict[title]['num_of_stores'] = num_of_stores
@@ -99,7 +102,9 @@ def _handle_rows_page(soup):
 
     for info in results:
         # extract some general stuff
-        title = info.find(attrs={'class': 'ProdInfoTitle'}).a.text
+        product_name_element = info.find(attrs={"class": "ProdInfoTitle"})
+        title, model_id = product_name_element.a.text, MODEL_ID_RE.findall(product_name_element.a.get('href'))[0]
+        logger.debug("Got ID {} - {}".format(model_id, title))
         price_info, min_price, max_price = info.parent.find(attrs={'class': 'pricesTxt'}), None, None
         if price_info:
             min_price, max_price = _handle_price(price_info.text)
@@ -112,8 +117,10 @@ def _handle_rows_page(soup):
                 details[_clean_string(category)] = _clean_string(detail)
 
         results_dict[title] = details
+        results_dict[title]['id'] = model_id
         results_dict[title]['min_price'] = min_price
         results_dict[title]['max_price'] = max_price
+
     return results_dict
 
 

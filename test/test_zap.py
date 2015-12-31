@@ -66,7 +66,7 @@ def test_categories_extracted_correctly(rows_products_page):
     assert set(details.keys()) == \
            {'יצרן', 'גודל מסך', 'רזולוציה מקסימלית', 'סוג פאנל', 'זמן תגובה', 'סוג המסך', 'רמקולים', '\u200fPivot',
             'תלת מימד', 'חיבורים',
-            'תאריך כניסה לזאפ', 'min_price', 'max_price'}
+            'תאריך כניסה לזאפ', 'min_price', 'max_price', 'id'}
 
 
 def test_gets_result_when_no_category(test_session):
