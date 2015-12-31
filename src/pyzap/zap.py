@@ -41,7 +41,7 @@ class ZapGalleryType(Enum):
 
 
 def _handle_price(price_str):
-    # handle price vs price range (2500 or '2500-3000')
+    # handle price vs price range (2500 or '₪2500-3000')
     if not price_str:
         return None
     prices = PRICE_RE.findall(price_str)
