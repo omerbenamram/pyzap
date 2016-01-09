@@ -130,8 +130,7 @@ df
 </table>
 ....
 
-or use from command line (still a little rough with unicode support for argv in Windows).  
-(and get awesome excel support via pandas)
+or use from command line (and get an excel/csv - requires pandas!).  
 
     $ pyzap --help
    
