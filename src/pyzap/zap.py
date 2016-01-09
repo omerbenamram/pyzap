@@ -69,7 +69,10 @@ def _handle_gallery_page(soup):
 
     for box in results:
         product_name_element = box.find(attrs={"class": "ProdName"})
-        title, model_id = product_name_element.a.text, MODEL_ID_RE.findall(product_name_element.a.get('href'))[0]
+        title, model_id = product_name_element.a.text, MODEL_ID_RE.findall(product_name_element.a.get('href'))
+        if model_id:
+            model_id = model_id[0]
+
         num_of_stores = int(box.find(attrs={'class': 'num'}).text) or 0
         num_of_reviews = ''.join(box.find(attrs={"class": "ReviewsLink"}).strings).strip('\n')
 
@@ -103,7 +106,10 @@ def _handle_rows_page(soup):
     for info in results:
         # extract some general stuff
         product_name_element = info.find(attrs={"class": "ProdInfoTitle"})
-        title, model_id = product_name_element.a.text, MODEL_ID_RE.findall(product_name_element.a.get('href'))[0]
+        title, model_id = product_name_element.a.text, MODEL_ID_RE.findall(product_name_element.a.get('href'))
+        if model_id:
+            model_id = model_id[0]
+
         logger.debug("Got ID {} - {}".format(model_id, title))
         price_info, min_price, max_price = info.parent.find(attrs={'class': 'pricesTxt'}), None, None
         if price_info:
