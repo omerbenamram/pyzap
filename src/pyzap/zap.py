@@ -6,7 +6,7 @@ import warnings
 # noinspection PyUnresolvedReferences
 import sys
 from enum import Enum
-from typing import Union, List, Sized, Any
+from typing import Union, Dict
 
 import logbook
 import requests
@@ -17,6 +17,8 @@ import urllib
 from types import *
 from pies.overrides import *
 from pies import itertools
+
+from pyzap.utils import _clean_string, re_first_or_none, one
 
 if PY2:
     import urlparse
@@ -38,7 +40,6 @@ MODEL_ID_RE = re.compile("/model\.aspx\?modelid=(\d+)")
 BASE_URL = 'http://www.zap.co.il/models.aspx'
 NO_CATEGORY_BASE_URL = 'http://www.zap.co.il/search.aspx'
 WORDS_RE = re.compile('\w+', re.UNICODE)
-BAD_CHARS = ', :<>'
 
 
 class ZapGalleryType(Enum):
@@ -55,10 +56,6 @@ def _handle_price(price_str):
     # numbers are formatted as 2,500 sometimes..
     prices = list(map(lambda x: int(x.replace(',', '')), prices))
     return min(prices), max(prices)
-
-
-def _clean_string(info_string: str) -> str:
-    return info_string.strip(BAD_CHARS)
 
 
 def _detect_gallery_type(soup):
@@ -171,13 +168,14 @@ def search(keyword=None, category=None, max_pages=None, show_progress=True, sess
         params = {'keyword': keyword}
         urlbase = BASE_URL
 
-        if category:
-            params['sog'] = category
-
         if not category:
-            category = _infer_category_from_redirection(params=params, session=s)
-            # set baseurl accordingly..
-            urlbase = BASE_URL if category else NO_CATEGORY_BASE_URL
+            category = _infer_category(term=keyword, session=s)
+
+            if category:
+                params['sog'] = category
+
+        # set baseurl accordingly..
+        urlbase = BASE_URL if category else NO_CATEGORY_BASE_URL
 
         base = requests.Request(method='get', url=urlbase, params=params)
         logger.debug('Search Params: {}'.format(base.params))
@@ -222,27 +220,6 @@ def search(keyword=None, category=None, max_pages=None, show_progress=True, sess
     return total_results
 
 
-def re_first_or_none(regex, string):
-    match = re.search(regex, string)
-    if match:
-        return match.groups(0)[0]
-    return None
-
-
-def re_one_or_none(regex, string) -> Union[Any, None]:
-    match = re.findall(regex, string)
-    if match:
-        one(match)
-    return None
-
-
-def one(collection: Sized) -> Any:
-    if len(collection) > 1:
-        raise RuntimeError('Too many objects given where only one is expected!')
-    else:
-        return collection[0]
-
-
 def _scrape_categories_suggestions_box(soup) -> dict:
     filters_box = soup.find_all(attrs={'class': 'Filters'})
     if filters_box:
@@ -258,12 +235,17 @@ def _scrape_categories_suggestions_box(soup) -> dict:
         return {}
 
 
-def _infer_category_from_redirection(params: dict, session) -> Union[str, List[str], None]:
+def suggest_categories(term) -> Dict[str:int]:
+    return _infer_category(term, return_many=True)
+
+
+def _infer_category(term: str, session=None, return_many=False) -> Union[str, Dict[str: int], None]:
     """
     make a request to try and grab category from zap's engine
     """
-    logger.debug("No Category received, trying to infer category from redirection")
-
+    session = session or requests.Session()
+    logger.debug("trying to infer category for term {}".format(term))
+    params = {'keyword': term}
     head = requests.Request(method='get', url=NO_CATEGORY_BASE_URL, params=params)
 
     head_resp = session.send(head.prepare())
@@ -272,14 +254,17 @@ def _infer_category_from_redirection(params: dict, session) -> Union[str, List[s
     if head_resp.history:
         if head_resp.history[0].headers.get('Location'):
             category = urllib.parse.urlparse(head_resp.history[0].headers.get('Location')).query.split('=')[1]
-            params['sog'] = category
-            params.pop('keyword')
             logger.debug("Successfully extracted category {}".format(category))
             return category
 
     # perhaps there are multiple categories?
     else:
-        pass
+        categories = _scrape_categories_suggestions_box(soup=BeautifulSoup(head_resp.content))
+        if categories:
+            if return_many:
+                return categories
+            logger.warning('Got several categories! {}'.format(list(categories.keys())))
+            return None
 
     logger.error("Could'nt autodetect category.. search will not be filtered!")
     return None

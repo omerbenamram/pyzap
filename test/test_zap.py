@@ -82,6 +82,11 @@ def test_gets_result_when_no_category(test_session):
     assert len(results) > 0
 
 
+def test_gets_multiple_categories(test_session):
+    results = search('cisco', session=test_session, max_pages=1)
+    assert len(results) > 0
+
+
 def test_extracts_multiple_categories_from_broad_term(broad_term_page):
     categories_suggestions = _scrape_categories_suggestions_box(broad_term_page)
     assert categories_suggestions == {'e-telephone': 9, 'c-router': 32, 'c-controller': 4,
