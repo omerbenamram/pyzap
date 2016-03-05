@@ -2,15 +2,19 @@ from __future__ import absolute_import, unicode_literals, print_function, divisi
 # -*- coding: utf-8 -*-
 
 import re
-import sys
 import warnings
+# noinspection PyUnresolvedReferences
+import sys
 from enum import Enum
+from typing import Union, List, Sized, Any
+
 import logbook
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 from pyzap.categories import suggest_category
 import urllib
+from types import *
 from pies.overrides import *
 from pies import itertools
 
@@ -28,6 +32,7 @@ else:
 logger.handlers.append(logbook.StreamHandler(sys.stdout))
 
 PRICE_RE = re.compile('[\d,]+', re.UNICODE)
+NUMBER_OF_RE = re.compile('\(([\d,]+)\)', re.UNICODE)
 CAT_RE = re.compile("/models\.aspx\?sog=([\w-]+)")
 MODEL_ID_RE = re.compile("/model\.aspx\?modelid=(\d+)")
 BASE_URL = 'http://www.zap.co.il/models.aspx'
@@ -52,7 +57,7 @@ def _handle_price(price_str):
     return min(prices), max(prices)
 
 
-def _clean_string(info_string):
+def _clean_string(info_string: str) -> str:
     return info_string.strip(BAD_CHARS)
 
 
@@ -159,7 +164,7 @@ def search(keyword=None, category=None, max_pages=None, show_progress=True, sess
     if not any([keyword, category]):
         raise RuntimeError("Must Input at least one argument!")
 
-    session = requests.Session() or session
+    session = session or requests.Session()
 
     with session as s:
         total_results = {}
@@ -170,24 +175,9 @@ def search(keyword=None, category=None, max_pages=None, show_progress=True, sess
             params['sog'] = category
 
         if not category:
-            # this part is a little ugly - it handles a case where we have to infer category from redirection
-            # check if we get redirected
-            logger.debug("No Category received, trying to infer category from redirection")
-            urlbase = NO_CATEGORY_BASE_URL
-            head = requests.Request(method='get', url=urlbase, params=params)
-            head_resp = s.send(head.prepare())
-
-            if head_resp.history:
-                if head_resp.history[0].headers.get('Location'):
-                    category = urllib.parse.urlparse(head_resp.history[0].headers.get('Location')).query.split('=')[1]
-                    params['sog'] = category
-                    params.pop('keyword')
-                    logger.debug("Successfully extracted category {}".format(category))
-                    urlbase = BASE_URL
-            else:
-                # even if no category is available we will get misc results
-                logger.error("Could'nt autodetect category.. search will not be filtered!")
-                urlbase = NO_CATEGORY_BASE_URL
+            category = _infer_category_from_redirection(params=params, session=s)
+            # set baseurl accordingly..
+            urlbase = BASE_URL if category else NO_CATEGORY_BASE_URL
 
         base = requests.Request(method='get', url=urlbase, params=params)
         logger.debug('Search Params: {}'.format(base.params))
@@ -230,3 +220,66 @@ def search(keyword=None, category=None, max_pages=None, show_progress=True, sess
 
     logger.info("Total {} results".format(len(total_results)))
     return total_results
+
+
+def re_first_or_none(regex, string):
+    match = re.search(regex, string)
+    if match:
+        return match.groups(0)[0]
+    return None
+
+
+def re_one_or_none(regex, string) -> Union[Any, None]:
+    match = re.findall(regex, string)
+    if match:
+        one(match)
+    return None
+
+
+def one(collection: Sized) -> Any:
+    if len(collection) > 1:
+        raise RuntimeError('Too many objects given where only one is expected!')
+    else:
+        return collection[0]
+
+
+def _scrape_categories_suggestions_box(soup) -> dict:
+    filters_box = soup.find_all(attrs={'class': 'Filters'})
+    if filters_box:
+        filters_box = one(filters_box)
+        # get all category links
+        items = filters_box.find_all('a', href=CAT_RE)
+        # create category / number of items dict
+        results = {re_first_or_none(CAT_RE, i.get('href'))
+                   : int(re_first_or_none(NUMBER_OF_RE, i.text)) for i in items}
+        return results
+    else:
+        logger.debug('Categories filterbox is unavailable..')
+        return {}
+
+
+def _infer_category_from_redirection(params: dict, session) -> Union[str, List[str], None]:
+    """
+    make a request to try and grab category from zap's engine
+    """
+    logger.debug("No Category received, trying to infer category from redirection")
+
+    head = requests.Request(method='get', url=NO_CATEGORY_BASE_URL, params=params)
+
+    head_resp = session.send(head.prepare())
+
+    # check if we get redirected and extract category
+    if head_resp.history:
+        if head_resp.history[0].headers.get('Location'):
+            category = urllib.parse.urlparse(head_resp.history[0].headers.get('Location')).query.split('=')[1]
+            params['sog'] = category
+            params.pop('keyword')
+            logger.debug("Successfully extracted category {}".format(category))
+            return category
+
+    # perhaps there are multiple categories?
+    else:
+        pass
+
+    logger.error("Could'nt autodetect category.. search will not be filtered!")
+    return None
