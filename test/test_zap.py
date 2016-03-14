@@ -92,6 +92,16 @@ def test_gets_results_when_supplied_category(test_session):
     assert len(results) == 24
 
 
+def test_gets_results_from_multuple_pages(test_session):
+    results = search('cisco', session=test_session, max_pages=5)
+    assert len(results) == 84
+
+
+def test_gets_results_from_multuple_pages_than_gets_more_pages(test_session):
+    results = search('cisco', session=test_session)
+    assert len(results) != 84
+
+
 def test_extracts_multiple_categories_from_broad_term(broad_term_page):
     categories_suggestions = _scrape_categories_suggestions_box(broad_term_page)
     assert categories_suggestions == {'e-telephone': 9, 'c-router': 32, 'c-controller': 4,

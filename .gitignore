@@ -4,3 +4,4 @@ src/pyzap.egg-info/
 /test/fixtures
 src/scripts/apikey.txt
 .tox
+**.cache
