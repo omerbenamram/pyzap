@@ -1,12 +1,10 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
 # -*- coding: utf-8 -*-
-
 import re
 import warnings
 # noinspection PyUnresolvedReferences
 import sys
 from enum import Enum
-from typing import Union, Dict
 
 import logbook
 import requests
@@ -171,8 +169,8 @@ def search(keyword=None, category=None, max_pages=None, show_progress=True, sess
         if not category:
             category = _infer_category(term=keyword, session=s)
 
-            if category:
-                params['sog'] = category
+        if category:
+            params['sog'] = category
 
         # set baseurl accordingly..
         urlbase = BASE_URL if category else NO_CATEGORY_BASE_URL
@@ -235,11 +233,11 @@ def _scrape_categories_suggestions_box(soup) -> dict:
         return {}
 
 
-def suggest_categories(term) -> Dict[str:int]:
-    return _infer_category(term, return_many=True)
+def suggest_categories(term, session=None):
+    return _infer_category(term, return_many=True, session=session)
 
 
-def _infer_category(term: str, session=None, return_many=False) -> Union[str, Dict[str: int], None]:
+def _infer_category(term: str, session=None, return_many=False):
     """
     make a request to try and grab category from zap's engine
     """
@@ -259,7 +257,7 @@ def _infer_category(term: str, session=None, return_many=False) -> Union[str, Di
 
     # perhaps there are multiple categories?
     else:
-        categories = _scrape_categories_suggestions_box(soup=BeautifulSoup(head_resp.content))
+        categories = _scrape_categories_suggestions_box(soup=BeautifulSoup(head_resp.content, 'lxml'))
         if categories:
             if return_many:
                 return categories

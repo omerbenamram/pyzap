@@ -9,7 +9,7 @@ from betamax import Betamax
 from bs4 import BeautifulSoup
 
 from pyzap.zap import products_from_page, search, ZapGalleryType, _detect_gallery_type, \
-    _scrape_categories_suggestions_box
+    _scrape_categories_suggestions_box, suggest_categories
 
 SAMPLE_ROWS_URL = 'http://www.zap.co.il/models.aspx?sog=c-monitor'
 SAMPLE_BOX_URL = 'http://www.zap.co.il/models.aspx?sog=p-shoe'
@@ -87,8 +87,20 @@ def test_gets_multiple_categories(test_session):
     assert len(results) > 0
 
 
+def test_gets_results_when_supplied_category(test_session):
+    results = search('cisco', category='c-repeater', session=test_session, max_pages=1)
+    assert len(results) == 24
+
+
 def test_extracts_multiple_categories_from_broad_term(broad_term_page):
     categories_suggestions = _scrape_categories_suggestions_box(broad_term_page)
     assert categories_suggestions == {'e-telephone': 9, 'c-router': 32, 'c-controller': 4,
                                       'c-harddrive': 1, 'c-hub': 273, 'c-repeater': 26, 'c-switching': 17,
                                       'e-headphone': 1, 'g-recordingsystem': 2}
+
+
+def test_suggest_categories(test_session):
+    categories = suggest_categories('cisco', session=test_session)
+    assert categories == {'e-telephone': 9, 'c-router': 32, 'c-controller': 4,
+                          'c-harddrive': 1, 'c-hub': 272, 'c-repeater': 25, 'c-switching': 17,
+                          'e-headphone': 1, 'g-recordingsystem': 2}
