@@ -3,8 +3,6 @@ from __future__ import absolute_import, unicode_literals, print_function, divisi
 from collections import namedtuple
 from fuzzywuzzy import process
 
-from pies.overrides import *
-
 ZapCategory = namedtuple('ZapCategory', ['category', 'hebrew_description', 'english_description'])
 
 

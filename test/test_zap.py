@@ -8,8 +8,8 @@ import requests
 from betamax import Betamax
 from bs4 import BeautifulSoup
 
-from pyzap.zap import products_from_page, search, ZapGalleryType, _detect_gallery_type, \
-    _scrape_categories_suggestions_box, suggest_categories
+from pyzap.zap import search, suggest_categories
+from pyzap.scraper import _detect_gallery_type, products_from_page, _scrape_categories_suggestions_box, ZapGalleryType
 
 SAMPLE_ROWS_URL = 'http://www.zap.co.il/models.aspx?sog=c-monitor'
 SAMPLE_BOX_URL = 'http://www.zap.co.il/models.aspx?sog=p-shoe'
