@@ -25,7 +25,7 @@ BASE_URL = 'http://www.zap.co.il/models.aspx'
 NO_CATEGORY_BASE_URL = 'http://www.zap.co.il/search.aspx'
 
 
-def search(keyword=None, category=None, max_pages=None, show_progress=True, session=None, loop=None, **kwargs):
+def search(keyword=None, category=None, max_pages=None, show_progress=False, session=None, **kwargs):
     if not any([keyword, category]):
         raise RuntimeError("Must Input at least one argument!")
 
@@ -55,7 +55,6 @@ def search(keyword=None, category=None, max_pages=None, show_progress=True, sess
 
         # first page
         params['pageinfo'] = current_page
-        logger.debug("Sending request: {}".format(urlbase))
         response = s.get(url=urlbase, params=params)
         response.raise_for_status()
 
@@ -97,13 +96,13 @@ def search(keyword=None, category=None, max_pages=None, show_progress=True, sess
 
             if show_progress:
                 progressbar.total = max_available_page_from_scope
-            progressbar.update()
+                progressbar.update()
 
             if (max_available_page_from_scope <= current_page) or (max_pages and (max_pages <= current_page)):
                 reached_page_limit = True
                 logger.debug('Hit last page at {}, breaking'.format(current_page))
 
-            logger.debug("Total {} results".format(len(total_results)))
+            logger.info("Total {} results".format(len(total_results)))
 
         if not total_results:
             if not category:
