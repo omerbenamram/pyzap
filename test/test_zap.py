@@ -89,7 +89,7 @@ def test_gets_multiple_categories(test_session):
 
 def test_gets_results_when_supplied_category(test_session):
     results = search('cisco', category='c-repeater', session=test_session, max_pages=1)
-    assert len(results) == 24
+    assert len(results) == 25
 
 
 def test_gets_results_from_multuple_pages(test_session):
@@ -99,7 +99,7 @@ def test_gets_results_from_multuple_pages(test_session):
 
 def test_gets_results_from_multuple_pages_than_gets_more_pages(test_session):
     results = search('cisco', session=test_session)
-    assert len(results) != 84
+    assert len(results) == 282
 
 
 def test_extracts_multiple_categories_from_broad_term(broad_term_page):
