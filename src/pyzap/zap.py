@@ -86,7 +86,7 @@ def search(keyword=None, category=None, max_pages=None, show_progress=False, ses
                 soup = BeautifulSoup(response.content, "lxml")
                 total_results.update(products_from_page(soup))
 
-            current_page += (max_available_page_from_scope - 1)
+            current_page += len(responses)
             logger.debug('Current new page - {}'.format(current_page))
 
             # TODO: optimize this?
