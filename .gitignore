@@ -1,7 +1,6 @@
 src/pyzap.egg-info/
 .idea/
 *.pyc
-/test/fixtures
 src/scripts/apikey.txt
 .tox
 **.cache
