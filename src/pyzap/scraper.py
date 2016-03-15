@@ -111,7 +111,7 @@ def products_from_page(soup):
         return _handle_rows_page(soup)
 
 
-def _scrape_categories_suggestions_box(soup) -> dict:
+def _scrape_categories_suggestions_box(soup):
     filters_box = soup.find_all(attrs={'class': 'Filters'})
     if filters_box:
         filters_box = one(filters_box)

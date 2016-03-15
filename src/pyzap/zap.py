@@ -1,21 +1,21 @@
 from __future__ import absolute_import, unicode_literals, print_function, division
 # -*- coding: utf-8 -*-
+from ._compat import urllib
 import warnings
 import requests
 import grequests
 # noinspection PyUnresolvedReferences
 import sys
 
-import itertools
 import logbook
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 from pyzap.categories import suggest_category
-import urllib
-from types import *
+from pies.overrides import *
 
 from pyzap.scraper import _get_max_available_page_in_context, products_from_page, _scrape_categories_suggestions_box
+from pyzap.constants import _parser
 
 logger = logbook.Logger("pyzap", level=logbook.DEBUG)
 
@@ -25,7 +25,7 @@ BASE_URL = 'http://www.zap.co.il/models.aspx'
 NO_CATEGORY_BASE_URL = 'http://www.zap.co.il/search.aspx'
 
 
-def search(keyword=None, category=None, max_pages=None, show_progress=False, session=None, **kwargs):
+def search(keyword=None, category=None, max_pages=None, show_progress=False, session=None):
     if not any([keyword, category]):
         raise RuntimeError("Must Input at least one argument!")
 
@@ -58,7 +58,7 @@ def search(keyword=None, category=None, max_pages=None, show_progress=False, ses
         response = s.get(url=urlbase, params=params)
         response.raise_for_status()
 
-        soup = BeautifulSoup(response.content, "lxml")
+        soup = BeautifulSoup(response.content, _parser)
 
         total_results.update(products_from_page(soup))
         max_available_page_from_scope = _get_max_available_page_in_context(soup)
@@ -74,7 +74,7 @@ def search(keyword=None, category=None, max_pages=None, show_progress=False, ses
                 batch_urls.append(url)
 
             if max_pages:
-                batch_urls = itertools.islice(batch_urls, max_pages)
+                batch_urls = batch_urls[:max_pages]
 
             responses = grequests.map((grequests.get(u) for u in batch_urls))
             # evil generator - i will cage you in this list!
@@ -83,7 +83,7 @@ def search(keyword=None, category=None, max_pages=None, show_progress=False, ses
             logger.debug('Got {} responses'.format(len(responses)))
 
             for response in responses:
-                soup = BeautifulSoup(response.content, "lxml")
+                soup = BeautifulSoup(response.content, _parser)
                 total_results.update(products_from_page(soup))
 
             current_page += len(responses)
@@ -91,7 +91,7 @@ def search(keyword=None, category=None, max_pages=None, show_progress=False, ses
 
             # TODO: optimize this?
             max_available_page_from_scope = _get_max_available_page_in_context(
-                BeautifulSoup(responses[-1].content, "lxml"))
+                BeautifulSoup(responses[-1].content, _parser))
             logger.debug('Current new max available - {}'.format(max_available_page_from_scope))
 
             if show_progress:
@@ -119,7 +119,7 @@ def suggest_categories(term, session=None):
     return _infer_category(term, return_many=True, session=session)
 
 
-def _infer_category(term: str, session=None, return_many=False):
+def _infer_category(term, session=None, return_many=False):
     """
     make a request to try and grab category from zap's engine
     """
@@ -139,7 +139,7 @@ def _infer_category(term: str, session=None, return_many=False):
 
     # perhaps there are multiple categories?
     else:
-        categories = _scrape_categories_suggestions_box(soup=BeautifulSoup(first_page.content, 'lxml'))
+        categories = _scrape_categories_suggestions_box(soup=BeautifulSoup(first_page.content, _parser))
         if categories:
             if return_many:
                 return categories

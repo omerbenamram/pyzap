@@ -1,5 +1,6 @@
-from __future__ import absolute_import, unicode_literals, print_function, division
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function, division
+
 
 import os
 
@@ -9,6 +10,7 @@ from betamax import Betamax
 from bs4 import BeautifulSoup
 
 from pyzap.zap import search, suggest_categories
+from pyzap.constants import _parser
 from pyzap.scraper import _detect_gallery_type, products_from_page, _scrape_categories_suggestions_box, ZapGalleryType
 
 SAMPLE_ROWS_URL = 'http://www.zap.co.il/models.aspx?sog=c-monitor'
@@ -35,19 +37,19 @@ def test_session(request):
 @pytest.fixture
 def rows_products_page(test_session):
     r = test_session.get(SAMPLE_ROWS_URL)
-    return BeautifulSoup(r.content, 'lxml')
+    return BeautifulSoup(r.content, _parser)
 
 
 @pytest.fixture
 def gallery_products_page(test_session):
     r = test_session.get(SAMPLE_BOX_URL)
-    return BeautifulSoup(r.content, 'lxml')
+    return BeautifulSoup(r.content, _parser)
 
 
 @pytest.fixture
 def broad_term_page(test_session):
     r = test_session.get(BROAD_TERM_PAGE)
-    return BeautifulSoup(r.content, 'lxml')
+    return BeautifulSoup(r.content, _parser)
 
 
 def test_detect_page_correctly(rows_products_page, gallery_products_page):
@@ -68,7 +70,6 @@ def test_gallery_page_gets_resutls(gallery_products_page):
 def test_categories_extracted_correctly(rows_products_page):
     page_results = products_from_page(rows_products_page)
     # when columns are extracted badly - we get out of split results such as dates as columns.
-
     details = page_results['מסך מחשב Philips 246V5LHAB  ‏24 ‏אינטש']
 
     assert set(details.keys()) == \

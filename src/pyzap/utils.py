@@ -1,13 +1,12 @@
 # coding=utf-8
 import re
-from typing import Union, Any, Sized
 
 from pies.overrides import *
 
 from pyzap.constants import BAD_CHARS, PRICE_RE
 
 
-def _clean_string(info_string: str) -> str:
+def _clean_string(info_string):
     return info_string.strip(BAD_CHARS)
 
 
@@ -18,14 +17,14 @@ def re_first_or_none(regex, string):
     return None
 
 
-def re_one_or_none(regex, string) -> Union[Any, None]:
+def re_one_or_none(regex, string):
     match = re.findall(regex, string)
     if match:
         one(match)
     return None
 
 
-def one(collection: Sized) -> Any:
+def one(collection):
     if len(collection) > 1:
         raise RuntimeError('Too many objects given where only one is expected!')
     else:
