@@ -20,39 +20,50 @@ def _detect_gallery_type(soup):
 
 
 def _handle_gallery_page(soup):
-    results = soup.find_all(attrs={'class': 'GalleryProductBox CompareModel'})
+    results = soup.find_all(attrs={'class': 'GalleryProductBox'})
     results_dict = {}
 
     for box in results:
-        product_name_element = box.find(attrs={"class": "ProdName"})
-        title, model_id = product_name_element.a.text, MODEL_ID_RE.findall(product_name_element.a.get('href'))
-        if model_id:
-            model_id = model_id[0]
-
-        num_of_stores = int(box.find(attrs={'class': 'num'}).text) or 0
-        num_of_reviews = ''.join(box.find(attrs={"class": "ReviewsLink"}).strings).strip('\n')
-
-        # handle reviews
-        match = re.findall("(\d+)", num_of_reviews, re.UNICODE)
-        if match:
-            num_of_reviews = match[0]
-        elif re.findall('אחת', num_of_reviews, re.UNICODE):
-            num_of_reviews = 1
-        else:
-            num_of_reviews = 0
+        max_price, min_price, model_id, num_of_stores, number_of_reviews, title = _extract_information_from_gallery_box(
+            box)
 
         results_dict[title] = {}
-        price_info, min_price, max_price = box.parent.find(attrs={'class': 'prices'}), None, None
-        if price_info:
-            min_price, max_price = _handle_price(price_info.text)
-
         results_dict[title]['id'] = model_id
         results_dict[title]['min_price'] = min_price
         results_dict[title]['max_price'] = max_price
         results_dict[title]['num_of_stores'] = num_of_stores
-        results_dict[title]['reviews'] = num_of_reviews
+        results_dict[title]['reviews'] = number_of_reviews
 
     return results_dict
+
+
+def _extract_information_from_gallery_box(box):
+    product_name_element = box.find(attrs={"class": "ProdName"})
+    title, model_id = product_name_element.a.text, MODEL_ID_RE.findall(product_name_element.a.get('href'))
+    if model_id:
+        model_id = model_id[0]
+
+    # this fieldset is optional
+    num_of_stores, num_of_reviews_box = box.find(attrs={'class': 'num'}), box.find(attrs={"class": "ReviewsLink"})
+
+    if num_of_stores:
+        num_of_stores = int(num_of_stores.text) or 0
+
+    number_of_reviews = 0
+    if num_of_reviews_box:
+        # handle reviews
+        searchable_string = ''.join(num_of_reviews_box.strings).strip('\n')
+        match = NUMBER_OF_RE.findall(searchable_string)
+        if match:
+            number_of_reviews = match[0]
+        elif re.findall('אחת', searchable_string, re.UNICODE):
+            number_of_reviews = 1
+
+    price_info, min_price, max_price = box.parent.find(attrs={'class': 'prices'}), None, None
+    if price_info:
+        min_price, max_price = _handle_price(price_info.text)
+
+    return max_price, min_price, model_id, num_of_stores, number_of_reviews, title
 
 
 def _handle_rows_page(soup):
@@ -103,6 +114,8 @@ def products_from_page(soup):
     :return:
     """
     page_type = _detect_gallery_type(soup)
+
+    logger.debug("Page type is {}".format(page_type))
 
     if page_type == ZapGalleryType.ProductBoxGallery.value:
         return _handle_gallery_page(soup)

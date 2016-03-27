@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function, division
 
-
 import os
 
 import pytest
@@ -77,9 +76,11 @@ def test_categories_extracted_correctly(rows_products_page):
             'תלת מימד', 'חיבורים',
             'תאריך כניסה לזאפ', 'min_price', 'max_price', 'id'}
 
+
 def test_correctly_works_when_only_one_result_page_available(test_session):
     results = search('aeron', session=test_session)
     assert len(results) > 0
+
 
 def test_gets_result_when_no_category(test_session):
     results = search('מסך מחשב', session=test_session, max_pages=1)

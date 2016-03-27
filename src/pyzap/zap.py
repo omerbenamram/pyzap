@@ -54,8 +54,9 @@ def search(keyword=None, category=None, max_pages=None, show_progress=False, ses
         current_page = 1
 
         # first page
-        params['pageinfo'] = current_page
         response = s.get(url=urlbase, params=params)
+        # make sure no weird redirection occurs
+        logger.debug('Final url hit is {}'.format(response.url))
         response.raise_for_status()
 
         soup = BeautifulSoup(response.content, _parser)
@@ -63,7 +64,7 @@ def search(keyword=None, category=None, max_pages=None, show_progress=False, ses
         total_results.update(products_from_page(soup))
         max_available_page_from_scope = _get_max_available_page_in_context(soup)
         logger.debug('Max Available pages for page {} - {}'.format(current_page, max_available_page_from_scope))
-        
+
         while not reached_page_limit:
             # create batch
             batch_urls = []
@@ -131,12 +132,17 @@ def _infer_category(term, session=None, return_many=False):
 
     first_page = session.get(url=NO_CATEGORY_BASE_URL, params=params)
 
-    # check if we get redirected and extract category
+    # check if we get redirected and extract the category from the query string
     if first_page.history:
         if first_page.history[0].headers.get('Location'):
             # eww..
-            category = urllib.parse.urlparse(first_page.history[0].headers.get('Location')).query.split('=')[1]
-            logger.debug("Successfully extracted category {}".format(category))
+            query = urllib.parse.urlparse(first_page.history[0].headers.get('Location')).query
+            category = urllib.parse.parse_qs(query).get("sog")
+            if category:
+                category = category[0]
+                logger.debug("Successfully extracted category {}".format(category))
+            else:
+                logger.debug("Failed to extract category")
             return category
 
     # perhaps there are multiple categories?
