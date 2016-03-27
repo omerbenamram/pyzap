@@ -63,7 +63,7 @@ def search(keyword=None, category=None, max_pages=None, show_progress=False, ses
         total_results.update(products_from_page(soup))
         max_available_page_from_scope = _get_max_available_page_in_context(soup)
         logger.debug('Max Available pages for page {} - {}'.format(current_page, max_available_page_from_scope))
-
+        
         while not reached_page_limit:
             # create batch
             batch_urls = []
@@ -81,6 +81,8 @@ def search(keyword=None, category=None, max_pages=None, show_progress=False, ses
             responses = list(responses)
 
             logger.debug('Got {} responses'.format(len(responses)))
+            if not responses:
+                break
 
             for response in responses:
                 soup = BeautifulSoup(response.content, _parser)

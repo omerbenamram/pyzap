@@ -15,7 +15,7 @@ logger = logbook.Logger(__name__)
 def _detect_gallery_type(soup):
     if soup.find(attrs={'class': 'ProductBox CompareModel'}):
         return ZapGalleryType.ProductRows.value
-    elif soup.find(attrs={'class': 'GalleryProductBox CompareModel'}):
+    elif soup.find(attrs={'class': 'GalleryProductBox'}):
         return ZapGalleryType.ProductBoxGallery.value
 
 
